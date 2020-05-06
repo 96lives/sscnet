@@ -1,11 +1,11 @@
-function perpareNYUCADdata()
+%% function perpareNYUCADdata()
 % This function provide a example of how to convert the NYU ground truth
 % from 3D CAD model annotation provided by 
 % Guo, Ruiqi, Chuhang Zou, and Derek Hoiem. 
 %"Predicting complete 3d models of indoor scenes."
 
-dataRootfolder = '../data/'; 
-dataRootfolder = '/n/fs/suncg/voxelLabelComplete/sscnet_release/data';
+dataRootfolder = '../data_tmp/'; 
+% dataRootfolder = '/n/fs/suncg/voxelLabelComplete/sscnet_release/data';
 CAD_3D_gtpath  = '../NYUCAD_3D/';
 test = 1; % set it to 0 to save out files for training images
 savefiles = 0; % set it to 1 to save out files it might overright existing files
@@ -23,27 +23,30 @@ mapNYU40to36Ids =[0,mapNYU40to36Ids];
 
 if test
     load('./benchmark/test_NYUv2Ids.mat')
-    allSeq = testSeq;
+    disp("hi")
+    allSeq = testSeqId;
     outFolder = fullfile(dataRootfolder,'depthbin','/NYUCADtest/');
     outputmatPath = fullfile(dataRootfolder,'eval','NYUCADtest');
 else
     load('./benchmark/train_NYUv2Ids.mat')
-    allSeq = trainSeq;
+    allSeq = trainSeqId;
     outFolder = fullfile(dataRootfolder,'depthbin','/NYUCADtrain/');
     outputmatPath = fullfile(dataRootfolder,'eval','NYUCADtrain');
 end
 
 
 allannote = dir(fullfile(CAD_3D_gtpath, 'mat/') );
-allannote = allannote(4:end);
+allannote = al`lannote(4:end);
 for i = 1:length(allannote)
     ind = find(allannote(i).name == '_');
     count_id(i) = str2double(allannote(i).name(1:ind(1)-1));
 end
 
 volume_param;
+
+%% test
 for i = 1:length(allSeq)
-    %% get Id 
+    %% get Id : get neccessary files (.png(depth) and .bin(I don't know))
     Id = allSeq(i);  
     matdata_name = allannote(find(count_id ==Id)).name;
     depthFilename = fullfile(outFolder, sprintf('NYU%04d_0000.png',Id));
@@ -88,6 +91,7 @@ for i = 1:length(allSeq)
     
 
     %% Label the scene voxels
+    %{
     gridPtsLabel = zeros(1,size(gridPtsWorld,2));
     clear meshobjArr;        
     for i_obj = 1:length(model.objects)
@@ -186,7 +190,7 @@ for i = 1:length(allSeq)
 %     %% Render the depth map 
 %     mesh2obj(objFilename,meshobjArr,[]);
 %     [depthInpaint,segLabel] = renderView(objFilename,extrinsics2camPose(extCam2World));
-
+%}
     %% in FOV
     extWorld2Cam = inv([extCam2World;[0,0,0,1]]);
     gridPtsCam = extWorld2Cam(1:3,1:3)*gridPtsWorld + repmat(extWorld2Cam(1:3,4),1,size(gridPtsWorld,2));
@@ -201,6 +205,7 @@ for i = 1:length(allSeq)
 
     
     extSwap = [0,1,0;0,0,1;1,0,0];
+    
     [gridPtsX,gridPtsY,gridPtsZ] = ind2sub(voxSize,1:size(gridPtsLabel,2));
     gridPts = [gridPtsX(:),gridPtsY(:),gridPtsZ(:)]';
     gridPts = extSwap(1:3,1:3) * gridPts;

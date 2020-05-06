@@ -48,8 +48,8 @@ def writeply(filename, points,rgb):
     target.close()
 
 def test_model():
-    caffe.set_mode_gpu()
-    caffe.set_device(0)
+#caffe.set_mode_gpu()
+#    caffe.set_device(0)
     model_path =  'demo.txt'
     pretrained_path = '../models/suncg_ft_nyu.caffemodel'
     output_file = 'demo'

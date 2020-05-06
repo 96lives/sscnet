@@ -1,4 +1,4 @@
 #!/bin/bash
 
-wget http://sscnet.cs.princeton.edu/sscnet_release/NYUCAD_3D.zip
+wget --output-document=NYUCAD_3D.zip http://sscnet.cs.princeton.edu/sscnet_release/NYUCAD_3D.zip
 unzip NYUCAD_3D.zip

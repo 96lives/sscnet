@@ -15,3 +15,7 @@ results/*
 
 NYUCAD_3D
 *.zip
+caffe_code
+data
+data_tmp
+data_tmp2

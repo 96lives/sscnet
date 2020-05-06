@@ -1,8 +1,13 @@
-function evaluation_script(OutputPath,benchmark)
+%function evaluation_script(OutputPath,benchmark)
 % example: 
 % evluation_script('../results/','nyu')
 % evluation_script('../results/','nyucad')
 % evluation_script('../results/','suncg')
+
+% temporary
+OutputPath = '../results';
+benchmark = 'nyucad';
+% end temporary
 
 dataRootfolder = '../data/';
 dbstop if error;
@@ -10,6 +15,7 @@ hdf5Path = OutputPath;
 downscale = 4;
 addpath('./utils'); addpath('./benchmark');
 load('ClassMapping.mat');load('voxletTest');
+
 %% get mapping to 11 object class: 
 obj_class = {'empty','ceiling','floor','wall','window','chair','bed','sofa','table','tvs','furn','objs'};
 [~,mapIds] = ismember(map36to11,elevenClass);
@@ -55,6 +61,7 @@ for batchId = 1:numoffiles
     % get groundtruth  
     ld = load(fullfile(groundtruth_path,[Filename{batchId} '_gt_d4.mat'])); 
     sceneVox =ld.sceneVox_ds;
+    % get input? maybe? Na, I think they are just Output of result...
     ld = load(fullfile(evalvol_path,[Filename{batchId} '_vol_d4.mat']));
     vol =ld.flipVol_ds;
     sceneVox(sceneVox==255|isnan(sceneVox)) = 0;
@@ -119,7 +126,7 @@ for batchId = 1:50:size(predobjTensor,5);
     gridPts = [gridPtsX(:),gridPtsY(:),gridPtsZ(:)];    
     occSegLabelVal = labelobj(find(labelobj > 0));
     segGridPts = gridPts(find(labelobj > 0),:);
-    pcwrite(pointCloud(segGridPts,'Color',colorPalette(occSegLabelVal+1,:)),fullfile(OutputPath,benchmark,['label_' num2str(batchId)]),'PLYFormat','binary');
+    pcwrite(pointCloud(segGridPts,'Color',colorPalette(occSegLabelVal+1,:)),fullfile(OutputPath,benchmark,['label_' num2str(batchId),'.ply']),'PLYFormat','binary');
 
     %% segmentation predictions
     predobj_conf = predobjTensor(:,:,:,:,batchId);
@@ -127,5 +134,5 @@ for batchId = 1:50:size(predobjTensor,5);
     predobj = predobj-1;
     occSegPredVal = predobj(find(nonfree_voxels_to_evaluate&predobj>0));
     predGridPts = gridPts(find(nonfree_voxels_to_evaluate&predobj>0),:);
-    pcwrite(pointCloud(predGridPts,'Color',colorPalette(occSegPredVal+1,:)),fullfile(OutputPath,benchmark,['pred_' num2str(batchId)]),'PLYFormat','binary');
+    pcwrite(pointCloud(predGridPts,'Color',colorPalette(occSegPredVal+1,:)),fullfile(OutputPath,benchmark,['pred_' num2str(batchId),'.ply']),'PLYFormat','binary');
 end
